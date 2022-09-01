@@ -1,0 +1,59 @@
+Genepop 4.7.5: Hardy-Weinberg test
+
+File: genepop_format.txt (Title: HMPGL UTI 2021 2020 REDOME HLA INFO )
+
+Number of populations detected:    2
+Number of loci detected:           1
+
+
+Estimation of exact P-Values by the Markov chain method. 
+---------------------------------------------
+Markov chain parameters for all tests:
+Dememorization:              100000
+Batches:                     100000
+Iterations per batch:        100000
+Hardy Weinberg: Probability test
+        ************************
+
+
+==========================================
+     Results by locus
+==========================================
+
+
+Locus "HLAB"
+-----------------------------------------
+                             Fis estimates
+                            ---------------
+POP         P-val   S.E.    W&C     R&H     Steps 
+----------- ------- ------- ------- ------- ------
+2020_sampl  0.4624  0.0002  -0.0192 -0.0121 156762544 switches
+2021_sampl  0.5688  0.0002  -0.0635 -0.0349 199405440 switches
+
+All (Fisher's method):
+ Chi2:    2.6711
+ Df   :    4
+ Prob :    0.614277
+
+==========================================
+     Results by population
+==========================================
+
+
+Pop : 2020_sample
+-----------------------------------------
+                             Fis estimates
+                            ---------------
+locus       P-val   S.E.    W&C     R&H     Steps 
+----------- ------- ------- ------- ------- ------
+HLAB        0.4624  0.0002  -0.0192 -0.0121 156762544 switches
+
+Pop : 2021_sample
+-----------------------------------------
+                             Fis estimates
+                            ---------------
+locus       P-val   S.E.    W&C     R&H     Steps 
+----------- ------- ------- ------- ------- ------
+HLAB        0.5688  0.0002  -0.0635 -0.0349 199405440 switches
+
+Normal ending
