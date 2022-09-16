@@ -35,7 +35,7 @@ transform_data <- function(datafinal, sel_vars, type = NULL) {
                               "binned", allele2))
 
   new_dataset <- new_dataset %>%
-    dplyr::mutate_at(vars(smok_bv, sum_comorb), as.factor)
+    dplyr::mutate_at(vars(smok_bv), as.factor)
 
   if (type == "corr") {
     new_dataset <- new_dataset %>%
@@ -51,7 +51,9 @@ transform_data <- function(datafinal, sel_vars, type = NULL) {
 
   if(type == "glm") {
     new_dataset <- new_dataset %>%
-      tidyr::gather(., "Name", "allele", allele1, allele2)
+      tidyr::gather(., "Name", "allele", allele1, allele2) %>%
+      dplyr::mutate(Outcome_icu = ifelse(Outcome_icu == 0, "Alta", "Óbito"),
+                    allele = as.factor(allele))
   }
 
   return(new_dataset)
@@ -82,17 +84,17 @@ modelchecking <- function(cm, modeltype){
   }
 
   if (modeltype == "glm"){
-    print("ok")
+
     cm_simres <- simulateResiduals(fittedModel = cm, n = 250)
 
     plot1 <- ggplotify::as.ggplot(~plot(cm_simres, asFactor = FALSE), envir=environment())
 
     cm_simres_refit <- simulateResiduals(fittedModel = cm,
                                          n = 250,
-                                         refit = TRUE)
+                                         refit = FALSE)
     plot2 <- ggplotify::as.ggplot(~testDispersion(cm_simres_refit), envir=environment())
 
-    plot3 <- (plot1) / plot2 +  patchwork::plot_layout(nrow = 2, heights = c(2/5, 3/5))
+    plot3 <- (plot1) / plot2 +  patchwork::plot_layout(nrow = 2, heights = c(1.5/5, 3.5/5))
 
     return(plot3)
   }
@@ -261,23 +263,30 @@ plot_effects <- function(effect_rat, xlab, plim) {
     geom_errorbar(aes(x = ratio,
                     xmin = asymp.LCL,
                     xmax = asymp.UCL),
-                width = 0.02) +
+                width = 0.02
+                ) +
   # add zero effect line
     geom_vline(xintercept = 1,
-               linetype = "dashed") +
+               linetype = "dashed"
+               ) +
   # add p-values
     geom_text(aes(x = ratio,
                   y = contrast,
                   label = p_pretty),
-              vjust = -0.5) +
+              vjust = -0.5
+              ) +
     ggpubr::theme_pubr() +
-    ggpubr::rremove("ylab")+
+    ggplot2::theme(axis.title = element_text(face = "bold"),
+                   axis.text.y = element_text(size = 10)
+                   ) +
+    ggpubr::rremove("ylab"
+                    )+
     scale_x_continuous(position="top") # move x-axis to "top"
 
   return(plot_eff)
   }
 
-plot_response <- function(dataraw, data_emm, y_var, palette, ylabel, legendtitle) {
+plot_response <- function(dataraw, data_emm, y_var, palette, ylabel, strat, legend) {
 
   data_emm <- data.frame(data_emm)
 
@@ -286,52 +295,51 @@ plot_response <- function(dataraw, data_emm, y_var, palette, ylabel, legendtitle
                          y = get(y_var)
     )) +
   # add jittered points
-  geom_jitter(aes(colour = Age),
-              width = 0.3) +
-
+  geom_jitter(aes(colour = get(strat)),
+              width = 0.3
+              ) +
   # add layer containing means
   geom_point(data = data_emm,
              aes(y = response),
-             size = 2.5) +
-
+             size = 2.5
+             ) +
   # add layer containing error bars
   geom_errorbar(data = data_emm,
                 aes(y = response,
                     ymin = asymp.LCL,
                     ymax = asymp.UCL),
-                width = 0.05) +
-
+                width = 0.05
+                ) +
   # change the title of the y-axis
   labs(y = ylabel,
-       colour = legendtitle) +
-
+       colour = legend
+       ) +
   # change the theme
   theme_pubr() +
   # these theme modifications need to be added after re-setting
   # the theme
   theme(legend.position= "right",
         axis.title.x = element_blank(),
-        axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0))
+        axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0),
+                                    face = "bold"),
+        legend.title = element_text(face = "bold")
   ) +
-
   scale_colour_distiller(palette = palette)
-  # change the colors palette for the points
- # scale_color_brewer(brewer.pal(n = 12, name = "Purples"))
+
 
   return(plot_res)
 }
 
 
-plot_response_int <- function(dataraw, data_emm, y_var, ylabel, legendtitle) {
+plot_response_int <- function(dataraw, data_emm, y_var, ylabel, strat,legend, palette) {
 
   data_emm <- data.frame(data_emm)
 
   plot_int <- ggstripchart(
     data = dataraw,
     x = "allele",
-    y = "ICU_days",
-    color = "SamplesGroupYear",
-    fill = "SamplesGroupYear",
+    y = y_var,
+    color = strat,
     #  position = position_dodge(width = dodge_width)
     position = position_jitterdodge(dodge.width = .4,
                                     jitter.width = .2)
@@ -340,7 +348,7 @@ plot_response_int <- function(dataraw, data_emm, y_var, ylabel, legendtitle) {
     # add layer containing means
     geom_point(data = data_emm,
                aes(y = response,
-                   fill = factor(SamplesGroupYear)),
+                   color = as_factor(get(strat))),
                size = 2.5,
                position = position_dodge(width = .4)
                ) +
@@ -349,19 +357,22 @@ plot_response_int <- function(dataraw, data_emm, y_var, ylabel, legendtitle) {
                   aes(y = response,
                       ymin = asymp.LCL,
                       ymax = asymp.UCL,
-                      fill = factor(SamplesGroupYear)),
+                      color = as_factor(get(strat))),
                   width = 0.05,
                   position = position_dodge(width = .4)
                   ) +
     theme_pubr() +
     labs(y = ylabel,
-         color = legendtitle) +
+         color = legend
+         ) +
     #newtheme after theme pubr
     theme(legend.position= "right",
           axis.title.x = element_blank(),
-          axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0))
+          axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0),
+                                      face = "bold"),
+          legend.title = element_text(face = "bold")
     ) +
-    scale_colour_manual(values = c(gradient_orange[6], gradient_purple[6])
+    scale_colour_manual(values = c(palette[1], palette[2])
                         ) +
     scale_fill_discrete(guide="none")
 

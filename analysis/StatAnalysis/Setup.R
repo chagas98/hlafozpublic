@@ -46,5 +46,14 @@ control_freq_redome <-
 
 
 # DATASET
-data_final <- read.csv("/home/schagas/hlafozpublic/dataset_final.csv", sep = ",")
+data0 <- read.csv("/home/schagas/hlafozpublic/dataset_final.csv", sep = ",")
 
+data_final <- data0 %>%
+  filter(HospitalPeriod_days < 65)
+data0 %>%
+  filter(SamplesGroupYear == 2020) %>%
+  nrow()
+
+data0 %>%
+  filter(SamplesGroupYear == 2021) %>%
+  nrow()

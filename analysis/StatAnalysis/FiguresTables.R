@@ -59,7 +59,7 @@ alleles_MAF <- stat_alleleyears %>%
   mutate_all(~replace(., is.na(.), 0)) %>%
   filter(allele_frequency_2020 < 0.01 |
            allele_frequency_2021 < 0.01 |
-           Freq < 0.051 | n_2021 < 6 | n_2020 < 6)
+           Freq < 0.05 | n_2021 < 5 | n_2020 < 5)
 
 ##################  Summary Table 1 -  Clinical Variable  ######################
 
@@ -167,7 +167,7 @@ count <- data_final %>%
   dplyr::mutate(faceet_color =
                   case_when(
                     SamplesGroupYear == "2020" ~ gradient_orange[6],
-                    SamplesGroupYear == "2021" ~ gradient_purple[7]
+                    SamplesGroupYear == "2021" ~ gradient_purple[8]
                   ))
 
 p_count <- ggplot(count, aes(x = allele, fill = as.character(SamplesGroupYear))) +
@@ -177,7 +177,7 @@ p_count <- ggplot(count, aes(x = allele, fill = as.character(SamplesGroupYear)))
   labs(x = "",
        y = "Frequência (n)") +
   scale_y_continuous(expand = c(0, 0)) +
-  scale_fill_manual(values = c(gradient_orange[6], gradient_purple[7])) +
+  scale_fill_manual(values = c(gradient_orange[6], gradient_purple[8])) +
   theme_pubr() +
   ggtitle('A')
 
@@ -187,7 +187,7 @@ p_count2 <- ggplot(count, aes(x = allele, fill = Outcome_icu)) +
   labs(x = "",
        y = "Frequência (n)") +
   scale_y_continuous(expand = c(0, 0)) +
-  scale_fill_manual(values = c(gradient_orange[6], gradient_purple[7])) +
+  scale_fill_manual(values = c(gradient_orange[6], gradient_purple[8])) +
   facet_wrap(~SamplesGroupYear, scales = "free", ncol = 1) +
   theme_pubr() +
   theme(
@@ -417,10 +417,7 @@ selvar_fac <-
        FirstSymptons_days = "Primeiros \n Sintomas",
        SamplesGroupYear = "2021",
        Outcome_icu = "Óbito",
-       sum_comorb.0 = "Sem \n Comorb.",
-       sum_comorb.1 = "1 \n Comorb.",
-       sum_comorb.2 = "2 \n Comorb.",
-       sum_comorb.3 = ">3 \n Comorb.",
+       sum_comorb = "Comorb.",
        allele1 = "allele1",
        allele2 = "allele2")
 
@@ -495,24 +492,19 @@ glm_dataset1 <- glm_dataset[glm_dataset$SamplesGroupYear == "2021",]
 
 
 #MODELS
+glmmod <-  MASS:::glm.nb(ICU_days ~ allele*SamplesGroupYear, data = glm_dataset)
+
 #2020
-glmmod0 <-  MASS:::glm.nb(ICU_days ~ allele, data = glm_dataset0)
+glmmod0 <-  MASS:::glm.nb(ICU_days ~ allele + Age, data = glm_dataset0)
 
 #2021
-glmmod1 <-  MASS:::glm.nb(ICU_days ~ allele , data = glm_dataset1)
-#Interaction
-glmmodint0_ <- MASS:::glm.nb(ICU_days ~ Outcome_icu, data = glm_dataset0)
-glmmodint0_ <- MASS:::glm.nb(ICU_days ~ Outcome_icu, data = glm_dataset1)
-glmmodint0 <- MASS:::glm.nb(ICU_days ~ allele*Outcome_icu, data = glm_dataset0)
-glmmodint1 <- MASS:::glm.nb(ICU_days ~ allele*Outcome_icu, data = glm_dataset1)
+glmmod1 <-  MASS:::glm.nb(ICU_days ~ allele + Age, data = glm_dataset1)
 
 
-#Compare models
-glmmod0null <- update(glmmod0, . ~ . -allele)
+glmmodint0 <-  MASS:::glm.nb(ICU_days ~ allele*Outcome_icu, data = glm_dataset0)
+glmmodint1 <-  MASS:::glm.nb(ICU_days ~ allele*Outcome_icu, data = glm_dataset1)
 
-anova(glmmod0null, glmmod0)
-#anova(glmmodint0out, glmmodint0)
-
+h <- MASS:::glm.nb(ICU_days ~ allele*SamplesGroupYear, data = glm_dataset)
 
 #Responses
 response0 <- glm_emm(glmmod0,
@@ -521,26 +513,36 @@ response0 <- glm_emm(glmmod0,
 response1 <- glm_emm(glmmod1,
                      glm_dataset1,
                      "allele")
-#responseint <- glm_emm(glmmodint,
-#                       glm_dataset,
-#                       c("allele", "Outcome_icu", "SamplesGroupYear"))
-#responseintadj <- glm_emm(glmmodintadj,
-#                          glm_dataset,
-#                          c("allele", "SamplesGroupYear"))
-#responseint
-#Effect Ratio
-#Effect alone = Ratio between allele mean and the all alleles' mean
-#Effect ratio = ratio between two factors
+
+responseint0 <- glm_emm(glmmodint0,
+                       glm_dataset0,
+                       c("allele", "Outcome_icu"))
+responseint1 <- glm_emm(glmmodint1,
+                        glm_dataset1,
+                        c("allele", "Outcome_icu"))
+
+
+
+#Effects Ratio
 effect_rat0 <- glm_effect_rat(response0)
 effect_rat1 <- glm_effect_rat(response1)
-#effect_ratint <- glm_effect_rat(responseint)
-#effect_ratintadj <- glm_effect_rat(responseintadj)
-#effect_ratint
+effect_ratint0 <- glm_effect_rat(responseint0)
+effect_ratint1 <- glm_effect_rat(responseint1)
+
+
 #Plot Effects
-plot_eff0 <- plot_effects(effect_rat0, "Razão de Efeito", 0.06) + #IRR is exp(coef(B))
+plot_eff0 <- plot_effects(effect_rat0, "Razão de Efeito", 0.05) + #IRR is exp(coef(B))
   ggtitle("A")
-plot_eff1 <- plot_effects(effect_rat1, "Razão de Efeito", 0.5) +
+
+plot_eff1 <- plot_effects(effect_rat1, "Razão de Efeito", 0.05) +
   ggtitle("B")
+
+plot_eff3 <- plot_effects(effect_ratint0, "Razão de Efeito", 0.05) +
+  ggtitle("A")
+
+plot_eff4 <- plot_effects(effect_ratint1, "Razão de Efeito", 0.05) +
+  ggtitle("B")
+
 
 
 #Plot Responses
@@ -549,32 +551,190 @@ plot_res0 <- plot_response(dataraw = glm_dataset0,
                            y_var = "ICU_days",
                            palette = "Oranges",
                            ylabel = "Dias de UTI",
-                           legendtitle = "Idade")
+                           strat = "Age",
+                           legend = "Idade")
 
 plot_res1 <- plot_response(dataraw = glm_dataset1,
                            data_emm = response1,
                            y_var = "ICU_days",
                            palette = "Purples",
                            ylabel = "Dias de UTI",
-                           legendtitle = "Idade")
+                           strat = "Age",
+                           legend = "Idade")
 
-#plot_resint <- plot_response_int(dataraw = glm_dataset,
-#                                 data_emm = responseint,
-#                                 y_var = "ICU_days",
-#                                 ylabel = "Dia de UTI",
-#                                 legendtitle = "Ano de Coleta")
+plot_resint0 <- plot_response_int(dataraw = glm_dataset0,
+                                 data_emm = responseint0,
+                                 y_var = "ICU_days",
+                                 ylabel = "Dia de UTI",
+                                 strat = "Outcome_icu",
+                                 legend = "Desfecho",
+                                 palette = gradient_orange[c(6,8)])
+
+plot_resint1 <- plot_response_int(dataraw = glm_dataset1,
+                                  data_emm = responseint1,
+                                  y_var = "ICU_days",
+                                  ylabel = "Dia de UTI",
+                                  strat = "Outcome_icu",
+                                  legend = "Desfecho",
+                                  palette = gradient_purple[c(6,8)])
 
 #Save Plot
 fig3a <- (plot_eff0 / plot_res0)
 fig3b <- (plot_eff1 / plot_res1)
+fig4a <- (plot_eff3 / plot_resint0)
+fig4b <- (plot_eff4 / plot_resint1)
 
 
 fig3 <- (fig3a | fig3b)  +
   patchwork::plot_layout(ncol = 2, widths = c(2/5,3/5))
 
+fig4 <- (fig4a | fig4b)  +
+  patchwork::plot_layout(ncol = 2, widths = c(2/5,3/5))
 
-png("images/fig3_nbmodel.png", width = 12, height = 4, units = 'in', res = 300)
+fig4
+png("images/fig3_nbmodel.png", width = 14, height = 6, units = 'in', res = 300)
 print(fig3)
 while (!is.null(dev.list()))  dev.off()
-#############################  FIGURE 4  #######################################
 
+png("images/fig4_nbmodel.png", width = 14, height = 6, units = 'in', res = 300)
+print(fig4)
+while (!is.null(dev.list()))  dev.off()
+
+
+################################################################################
+#############################  SUPPLEMENTARY  ##################################
+################################################################################
+
+############################# OUTLIERS ########################################
+is_outlier <- function(x) {
+  return(x < quantile(x, 0.25) - 1.5 * IQR(x) | x > quantile(x, 0.75) + 1.5 * IQR(x))
+}
+
+outliersplot <- function(var, data) {
+
+   outliers <- data %>%
+     dplyr::select(var, SamplesGroupYear, Num_Sample, allele1, allele2) %>%
+     group_by(SamplesGroupYear) %>%
+     mutate(outlier = ifelse(is_outlier(get(var)),
+                             paste("Sample", Num_Sample, "\n", "=", get(var)), NA_character_),
+            SamplesGroupYear = as.character(SamplesGroupYear)) %>%
+     ggplot(aes(x = SamplesGroupYear, y = get(var),
+                color = SamplesGroupYear)) +
+     geom_boxplot() +
+     geom_text(aes(label = outlier), hjust = -.1,  size = 2) +
+     scale_color_manual(values = c(gradient_orange[6], gradient_purple[6])) +
+     theme_pubr() +
+     xlab("") +
+     ylab(var) +
+     theme(legend.position = "right",
+           legend.direction="vertical",
+           legend.title = element_blank())
+
+   return(outliers)
+}
+
+fig_out1 <- outliersplot("ICU_days", data0) + outliersplot("HospitalPeriod_days", data0)
+
+fig_out2 <- outliersplot("ICU_days", data_final) + outliersplot("HospitalPeriod_days", data_final)
+
+fig_out <- (fig_out1 / fig_out2) + patchwork::plot_annotation(tag_levels = "A")
+
+fig_out
+png("images/fig_outsupp.png", width = 10, height = 10, units = 'in', res = 300)
+print(fig_out)
+while (!is.null(dev.list()))  dev.off()
+
+############################# EPIDEMIOLOGICAL WEEKS ############################
+#(ie, comparing the period of weeks 8 to 43 in 2020 vs the period from week 44 in 2020 to week 21 in 2021)
+#https://www.hpsc.ie/notifiablediseases/resources/epidemiologicalweeks/
+
+epi_week <- function(date) {paste(lubridate::epiweek(date), lubridate::isoyear(date), sep = "/")}
+
+#https://www.thelancet.com/journals/lanres/article/PIIS2213-2600%2821%2900287-3/fulltext
+wave1 <- as.Date(c("2020/8/1","2020/43/1"), "%Y/%U/%u")
+wave1_mid <- wave1[1] + floor((wave1[2]-wave1[1])/2)
+
+wave2 <-  as.Date(c("2020/43/1","2021/21/1"), "%Y/%U/%u")
+wave2_mid <- wave2[1] + floor((wave2[2]-wave2[1])/2)
+
+
+out_diff <-  setdiff(data0$Num_Sample, data_final$Num_Sample)
+data0$seq <- seq_len(nrow(data0))
+
+
+time_epiw <- data0 %>%
+  dplyr::select(
+    Num_Sample, seq, allele1, allele2, HospitalPeriod_days, SamplesGroupYear,
+    Hospital_admission, ICU_admission, ICU_discharge) %>%
+  dplyr::mutate(
+    SamplesGroupYear = as.character(SamplesGroupYear),
+    `Alta Hospitalar` =as.Date(as.Date(Hospital_admission) + HospitalPeriod_days),
+    `Admissão Hospitalar`= as.Date(Hospital_admission),
+    `Entrada UTI` = as.Date(ICU_admission),
+    `Saída UTI` = as.Date(ICU_discharge)) %>%
+  gather("event", "date", "Alta Hospitalar":"Saída UTI")
+
+
+time_epiwout <- time_epiw %>%
+  mutate(outlier = ifelse(HospitalPeriod_days > 65 & event == "Alta Hospitalar",
+                          Num_Sample, NA_character_))
+time_epiwout
+Samplescollection_plot <- time_epiwout %>%
+  ggplot(aes(x = date, y = seq, group = Num_Sample, col = event)) +
+  annotate("rect", fill = "lightgrey", alpha = 0.5,
+           xmin = wave1[1], xmax = wave1[2],
+           ymin = -Inf, ymax = Inf) +
+  annotate("rect", fill = "grey", alpha = 0.5,
+           xmin = wave2[1], xmax = wave2[2],
+           ymin = -Inf, ymax = Inf) +
+  geom_text(
+    aes(x = wave1_mid, y = 70, label = "Primeira Onda"),
+    size = 3, vjust = 0, hjust = 0, color = "black"
+  )+
+  geom_text(
+    aes(x = wave2_mid, y = 70, label = "Segunda Onda"),
+    size = 3, vjust = 0, hjust = 0, color = "black"
+  )+
+  #geom_rect(data = rect1, aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), alpha = 0.4)
+  geom_line()  +
+  geom_point(shape = 15, size = 1.2) +
+  scale_x_date(date_breaks = "10 week", date_labels = "%U/%Y") +
+  scale_color_manual(values = c(gradient_orange[c(5,8)], gradient_purple[c(5,8)])) +
+  geom_text(aes(label = outlier), hjust = -.3,  size = 3, color = "black", show.legend = FALSE) +
+  labs(y = "Amostras") +
+  theme_pubr() +
+  theme(
+    axis.line.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank(),
+    legend.title = element_blank()#,
+   # legend.position = "right"
+  )
+
+Samplescollection_plot
+
+png("images/fig_collectionsupp.png", width = 15, height = 10, units = 'in', res = 300)
+print(Samplescollection_plot)
+while (!is.null(dev.list()))  dev.off()
+
+oi <- data0 %>%
+  filter(Num_Sample %in% out_diff) %>%
+  dplyr::select(Num_Sample, allele1, allele2, SamplesGroupYear, HospitalPeriod_days, Outcome_icu) %>%
+  gather("name", "allele", 2:3) %>%
+  group_by(SamplesGroupYear, allele, Outcome_icu) %>%
+  summarise(n = n())
+
+###############################  MODEL CHECK  ##################################
+
+
+glmmod0_check <- modelchecking(glmmod0, "glm")
+glmmod1_check <- modelchecking(glmmod1, "glm")
+glmmodint0_check <- modelchecking(glmmodint0, "glm")
+glmmodint1_check <- modelchecking(glmmodint1, "glm")
+
+
+#More Robust Testing
+#plot(performance::check_model(glmmod0))
+#plot(performance::check_distribution(glmmod0))
+#plot(performance::binned_residuals(glmmod0))
