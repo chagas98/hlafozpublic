@@ -36,11 +36,11 @@ csl: template/abnt.csl
 
 Mais informações podem ser acessadas em:
 
-  - [Relatório](LINK)
+  - [Relatório](https://github.com/chagas98/hlafozpublic/tree/main/Documents)
   
-  - [Resumo Expandido EICTI](LINK)
+  - [Resumo Expandido EICTI](https://github.com/chagas98/hlafozpublic/tree/main/Documents)
   
-  - [Código](LINK)
+  - [Código](https://github.com/chagas98/hlafozpublic)
   
 Descrição das Figuras e Tabelas:
 
@@ -311,6 +311,14 @@ modelchecking(glmmodint0, "glm")
 modelchecking(glmmodint1, "glm")
 
 ```
+
+
+## Dados (Entrada e Resultados)
+
+- [Dados de Entrada](https://github.com/chagas98/hlafozpublic/tree/main/input)
+
+- [Resultados adicionais](https://github.com/chagas98/hlafozpublic/tree/main/results)
+
 
 # REFERÊNCIAS
 

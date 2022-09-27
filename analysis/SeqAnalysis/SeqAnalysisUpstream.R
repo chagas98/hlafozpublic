@@ -25,7 +25,7 @@ invisible(apply(alleles21, 1,function(x) cat(x,"\n")))
 sink()
 
 
-outfile <- test_HW("genepop_format.txt",which='Proba', outputFile = "output_genepop.txt",batches = 10000,iterations = 10000, dememorization = 10000)
+outfile <- test_HW("results/genepop_format.txt",which='Proba', outputFile = "results/output_genepop.txt",batches = 10000,iterations = 10000, dememorization = 10000)
 
 
 
