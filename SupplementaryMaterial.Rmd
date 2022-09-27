@@ -42,6 +42,13 @@ Mais informações podem ser acessadas em:
   
   - [Código](https://github.com/chagas98/hlafozpublic)
   
+
+Dados (Entrada e Resultados)
+
+- [Dados de Entrada e Sequências](https://github.com/chagas98/hlafozpublic/tree/main/input)
+
+- [Resultados adicionais](https://github.com/chagas98/hlafozpublic/tree/main/results)
+  
 Descrição das Figuras e Tabelas:
 
   - [Tabela 1](#tab1)
@@ -313,11 +320,6 @@ modelchecking(glmmodint1, "glm")
 ```
 
 
-## Dados (Entrada e Resultados)
-
-- [Dados de Entrada](https://github.com/chagas98/hlafozpublic/tree/main/input)
-
-- [Resultados adicionais](https://github.com/chagas98/hlafozpublic/tree/main/results)
 
 
 # REFERÊNCIAS
