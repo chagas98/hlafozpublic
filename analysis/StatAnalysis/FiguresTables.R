@@ -57,9 +57,7 @@ stat_allelegrouped<- stats(data = data_final,
 #Minor Alleles Frequency
 alleles_MAF <- stat_alleleyears %>%
   mutate_all(~replace(., is.na(.), 0)) %>%
-  filter(allele_frequency_2020 < 0.01 |
-           allele_frequency_2021 < 0.01 |
-           Freq < 0.05 | n_2021 < 5 | n_2020 < 5)
+  filter(Freq < 0.05 | n_2021 < 5 | n_2020 < 5)
 
 ##################  Summary Table 1 -  Clinical Variable  ######################
 

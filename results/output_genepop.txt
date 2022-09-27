@@ -9,9 +9,9 @@ Number of loci detected:           1
 Estimation of exact P-Values by the Markov chain method. 
 ---------------------------------------------
 Markov chain parameters for all tests:
-Dememorization:              100000
-Batches:                     100000
-Iterations per batch:        100000
+Dememorization:              10000
+Batches:                     10000
+Iterations per batch:        10000
 Hardy Weinberg: Probability test
         ************************
 
@@ -27,13 +27,13 @@ Locus "HLAB"
                             ---------------
 POP         P-val   S.E.    W&C     R&H     Steps 
 ----------- ------- ------- ------- ------- ------
-2020_sampl  0.4624  0.0002  -0.0192 -0.0121 156762544 switches
-2021_sampl  0.5688  0.0002  -0.0635 -0.0349 199405440 switches
+2020_sampl  0.3288  0.0018  -0.0078 -0.0048 1446265 switches
+2021_sampl  0.5506  0.0021  -0.0611 -0.0351 1791640 switches
 
 All (Fisher's method):
- Chi2:    2.6711
+ Chi2:    3.4182
  Df   :    4
- Prob :    0.614277
+ Prob :    0.490423
 
 ==========================================
      Results by population
@@ -46,7 +46,7 @@ Pop : 2020_sample
                             ---------------
 locus       P-val   S.E.    W&C     R&H     Steps 
 ----------- ------- ------- ------- ------- ------
-HLAB        0.4624  0.0002  -0.0192 -0.0121 156762544 switches
+HLAB        0.3288  0.0018  -0.0078 -0.0048 1446265 switches
 
 Pop : 2021_sample
 -----------------------------------------
@@ -54,6 +54,6 @@ Pop : 2021_sample
                             ---------------
 locus       P-val   S.E.    W&C     R&H     Steps 
 ----------- ------- ------- ------- ------- ------
-HLAB        0.5688  0.0002  -0.0635 -0.0349 199405440 switches
+HLAB        0.5506  0.0021  -0.0611 -0.0351 1791640 switches
 
 Normal ending

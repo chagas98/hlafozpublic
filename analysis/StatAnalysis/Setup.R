@@ -25,6 +25,7 @@ library(MASS) #glm.nb
 library(ggplotify)
 library(DHARMa)
 library(rmdformats)
+library(webshot2)
 
 #sessioninfo::package_info()
 
@@ -46,7 +47,7 @@ control_freq_redome <-
 
 
 # DATASET
-data0 <- read.csv("/home/schagas/hlafozpublic/dataset_final.csv", sep = ",")
+data0 <- read.csv("/home/schagas/hlafozpublic/input/dataset_final.csv", sep = ",")
 
 data_final <- data0 %>%
   filter(HospitalPeriod_days < 65)

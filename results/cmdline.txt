@@ -1,10 +1,10 @@
 Genepop
 GenepopInputFile=genepop_format.txt
 MenuOptions=1:3
-Dememorisation=100000
+Dememorisation=10000
 HWtests=MCMC
-BatchNumber=100000
-BatchLength=100000
+BatchNumber=10000
+BatchLength=10000
 RandomSeed=67144630
 Mode=Batch
 

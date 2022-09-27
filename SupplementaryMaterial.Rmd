@@ -89,6 +89,9 @@ summary_table_final %>%
   autofit(part = "all") 
 
 ```
+```{r , include = FALSE}
+savetab <- flextable::save_as_image(summary_table_final, "results/table1.png", webshot = "webshot2")
+```
 
 
 ---
@@ -122,7 +125,8 @@ knitr::include_graphics("./images/fig1_count.png")
 
 ```{r fisheres, fig.width=8, echo = FALSE}
 
-fisher_res %>%
+
+fisher_tab <- fisher_res %>%
   dplyr::select(-p.adj.signif) %>% 
   dplyr::filter(p < 0.1) %>%
   dplyr::mutate(
@@ -132,10 +136,17 @@ fisher_res %>%
   fontsize(size = 8, part = "all") %>%
   autofit(part = "all") %>%
   align(align = "center", part = "all")%>% 
-  flextable::theme_vanilla()
+  flextable::theme_vanilla() 
+
+fisher_tab
 
 ```
 
+```{r, include = FALSE}
+
+#savetab <- flextable::save_as_image(fisher_tab, "results/tablefis.png", webshot = "webshot2")
+
+```
 ---
 
 
